@@ -1,85 +1,100 @@
-
-$(function(){
 const num_of_cats = 5;
 let model = {
-	current_cat: 0,
-	clicked: [0,0,0,0,0],
-	pictures: ['cat_picture1.jpg','cat_picture2.jpeg','cat_picture3.jpeg',
-						 'cat_picture4.jpeg', 'cat_picture5.jpeg'],
-};
-
-let octopus = {
-	render: () => {
-
-	},
 	init: () => {
 		for(let i = 0; i < num_of_cats; i++) {
 			model.clicked[i] = 0;
 		}
-		model.current_cat = 0;
-		view.render_counter(model.clicked[0]);
-		view.render_picture(model.pictures[0]);
-		view.init();
+		model.current_index = 0;
 	},
-	click_button: () => {
+	current_index: 0,
+	name: ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'],
+	clicked: [0,0,0,0,0],
+	pictures: ['cat_picture1.jpg','cat_picture2.jpeg','cat_picture3.jpeg',
+						 'cat_picture4.jpeg', 'cat_picture5.jpeg']
+};
 
-		model.current_index = 1;
-		view.render_counter(model.clicked[model.current_index]);
-		view.render_picture(model.pictures[model.current_index]);
+let octopus = {
+	init: () => {
+		model.init();
+		view.init();
+		octopus.fill_field();
+		view.render_counter();
+		view.render_picture();
 	},
-	click_cat: () => {
+	get_picture: () => {
+		return model.pictures[model.current_index];
+	},
+	get_counter: () => {
+		return model.clicked[model.current_index];
+	},
+	get_name: () => {
+		return model.name[model.current_index];
+	},
+	update_model: () => {
+		model.clicked[model.current_index] = view.get_clicks().value;
+		model.pictures[model.current_index] = view.get_url().value;
+		model.name[model.current_index] = view.get_name().value;
+		view.render_counter();
+		view.render_picture();
+	},
+	fill_field: () => {
+		view.get_clicks().value = model.clicked[model.current_index];
+		view.get_url().value = model.pictures[model.current_index];
+		view.get_name().value = model.name[model.current_index];
+	},
+	click_button: (e) => {
+		model.current_index = parseInt(e.target.className);
+		octopus.fill_field();
+		view.render_counter();
+		view.render_picture();
+	},
+	click_cat: (e) => {
 		model.clicked[model.current_index]++;
-		view.render_counter(model.clicked[model.current_index]);
+		octopus.fill_field();
+		view.render_counter();
 	}
 };
 
 let view = {
 	init: () => {
-		$('.button').click(octopus.click_button());
-		$('.cat').click(octopus.click_cat());
+		button = document.querySelector('#catlist');
+		cat = document.querySelector('.cat');
+		save = document.querySelector('.save');
+		ad_button = document.querySelector('.ad_button');
+		cancel = document.querySelector('.cancel');
+		button.addEventListener('click', octopus.click_button);
+		cat.addEventListener('click', octopus.click_cat);
+		save.addEventListener('click', (e) => {
+			octopus.update_model();
+			$('.fields').hide();
+		});
+		ad_button.addEventListener('click', (e) => {
+			$('.fields').show();
+		});
+		cancel.addEventListener('click', (e) => {
+			$('.fields').hide();
+		});
+		$('.fields').hide();
 	},
-	render_counter: (cnt) => {
-		$('.clicked').text(cnt);
+	get_clicks: () => {
+		return document.querySelector('.clicks');
 	},
-	render_picture: (picture) => {
-		$('cat_picture').src = picture;
+	get_url: () => {
+		return document.querySelector('.url');
+	},
+	get_name: () => {
+		return document.querySelector('.name');
+	},
+	render_counter: () => {
+		clicked = document.querySelector('.clicked');
+		clicked.innerHTML = octopus.get_counter();
+	},
+	render_picture: () => {
+		cat_picture = document.querySelector('.cat_picture');
+		cat_name = document.querySelector('.cat_name');
+		cat_picture.src = octopus.get_picture();
+		cat_name.innerHTML = octopus.get_name();
 	}
 };
 
 octopus.init();
-});
-// var cats = $(".cat");
-// var buttons = $("button");
-//
-// function hideAllCats(){
-// 	for (var i=0; i<cats.length; i++){
-// 		$(cats[i]).hide();
-// 	}
-// }
-//
-// function bindButtonToCat(idNumber){
-// 	$("#button"+idNumber).click(function(){
-// 		hideAllCats();
-// 		$("#cat"+idNumber).show();
-// 	})
-// }
-//
-// function bindCounterToCat(idNumber){
-// 	var cat = "#cat"+idNumber
-// 	$(cat).click(function(){
-// 		var count = $(cat+" > .counter").text();
-// 		count = parseInt(count) + 1;
-// 		$(cat+" > .counter").text(count);
-// 	})
-// }
-//
-// for (var i=1; i<=buttons.length; i++){
-// 	bindButtonToCat(i);
-// }
-//
-// for (var i=1; i<=cats.length; i++){
-// 	bindCounterToCat(i);
-// }
-//
-// hideAllCats();
-// $("#cat1").show();
